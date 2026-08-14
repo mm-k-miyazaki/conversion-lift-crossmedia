@@ -1,0 +1,47 @@
+cross-media validation summary
+==============================
+
+Input rows:
+  晴れ風: 36,144
+  メルカリ: 22,287
+
+Media-level ID uniqueness and treatment counts:
+  晴れ風 Netflix: N=9,478 / exposed=6,144 / control=3,334 / duplicate ID×media=0
+  晴れ風 Tver:    N=4,734 / exposed=175   / control=4,559 / duplicate ID×media=0
+  晴れ風 Amazon:  N=21,932 / exposed=653  / control=21,279 / duplicate ID×media=0
+  メルカリ Netflix: N=4,417  / exposed=2,990 / control=1,427  / duplicate ID×media=0
+  メルカリ Tver:    N=2,537  / exposed=82    / control=2,455  / duplicate ID×media=0
+  メルカリ Amazon:  N=12,350 / exposed=797   / control=11,553 / duplicate ID×media=0
+  メルカリ TV:      N=2,983  / exposed=2,136 / control=847    / duplicate ID×media=0
+
+Validation results:
+  - analysis ID missing: 0
+  - media_contact_flg values outside 1/2: 0
+  - own-media flag mismatch: 0
+  - other-media flag missing or outside 1/2/3: 0
+  - required covariate missing: 0
+  - old 6-level behavior covariates configured: 0
+  - configured analyses: 7
+  - configured KPI results: 21
+  - processed masterdata CSV generated in smoke test: 7
+  - IPW-DID result CSV generated in smoke test: 21
+  - analysis axes: overall only
+  - R parse check: passed for all pipeline and validation scripts
+
+New-pre behavior covariate counts:
+  晴れ風 Netflix 新プレ購入回数: Non=9,446 / Any=32
+  晴れ風 Tver 新プレ購入回数:    Non=4,725 / Any=9
+  晴れ風 Amazon 新プレ購入回数:  Non=21,900 / Any=32
+  メルカリ Netflix 新プレ利用時間: Non=3,298 / Light=373 / Middle=373 / Heavy=373
+  メルカリ Tver 新プレ利用時間:    Non=1,893 / Light=215 / Middle=215 / Heavy=214
+  メルカリ Amazon 新プレ利用時間:  Non=9,306 / Light=1,015 / Middle=1,015 / Heavy=1,014
+  メルカリ TV 新プレ利用時間:      Non=2,223 / Light=254 / Middle=253 / Heavy=253
+
+Smoke test (run_20260814_200511):
+  All category counts above matched exactly.
+  7 media × 3 KPI completed with WeightIt ATT and DRDID ipwdid.
+  Some small exposed groups emitted perfect-separation warnings from WeightIt,
+  but all estimated weights were finite and all 21 results completed.
+
+Excel formatting was not executed locally because openxlsx is not installed in
+the local R library. pipeline.r installs missing packages before Databricks execution.
