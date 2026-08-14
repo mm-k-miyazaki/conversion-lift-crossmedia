@@ -80,12 +80,14 @@
 
 - `validate_crossmedia.R`：7媒体の行数、接触／非接触件数、ID×媒体一意性、他媒体共変量、新プレ行動カテゴリ設定を読み取り専用で検証します。
 - `smoke_crossmedia.R`：Excel成型を除く7媒体×3 KPIのIPW-DIDを実行し、新プレ行動カテゴリ件数、21結果、出力列を検証します。
+- `validate_numeric_precision.R`：CSV出力前後で数値が丸められず、RDSの元値と高精度で一致することを検証します。
 
 ローカルRでコードフォルダをカレントディレクトリにした実行例：
 
 ```powershell
 Rscript validate_crossmedia.R .
 Rscript smoke_crossmedia.R . .validation_output
+Rscript validate_numeric_precision.R . .validation_output/run_YYYYMMDD_HHMMSS/rds
 ```
 
 ## 出力
@@ -98,6 +100,8 @@ Rscript smoke_crossmedia.R . .validation_output
 - `rds/`：設定、分析用データ、推計結果の中間オブジェクト
 
 結果には案件名、媒体、KPI、`media_contact_flg`、接触区分、N、前期間、後期間、前後差、推計効果、相対リフト、80%信頼区間を含みます。
+
+CSVとExcelセルには丸め前の数値を保持します。Excelでは表示形式だけを小数点第1位に設定し、数式バーやセル参照では元の精度を利用できます。`N`、`treat_flg`、`media_contact_flg`は整数表示です。
 
 ## 推計上の注意
 

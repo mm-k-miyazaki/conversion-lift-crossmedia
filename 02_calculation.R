@@ -1368,41 +1368,9 @@ did_with_ipw <- function(
 # ------------------------------------------------------------------------------
 
 format_result_for_csv <- function(result, treat_col = "treat_flg") {
-  out <- result
-
-  integer_like_cols <- intersect(c("N", "WB_N", treat_col, "media_contact_flg"), names(out))
-
-  if (length(integer_like_cols) > 0) {
-    out <- out %>%
-      dplyr::mutate(
-        dplyr::across(
-          .cols = dplyr::all_of(integer_like_cols),
-          .fns = ~ ifelse(
-            is.na(.x),
-            "",
-            format(round(.x, 0), nsmall = 0, trim = TRUE)
-          )
-        )
-      )
-  }
-
-  numeric_cols <- names(out)[vapply(out, is.numeric, FUN.VALUE = logical(1))]
-
-  if (length(numeric_cols) > 0) {
-    out <- out %>%
-      dplyr::mutate(
-        dplyr::across(
-          .cols = dplyr::all_of(numeric_cols),
-          .fns = ~ ifelse(
-            is.na(.x),
-            "",
-            format(round(.x, 1), nsmall = 1, trim = TRUE)
-          )
-        )
-      )
-  }
-
-  return(out)
+  # 数値は丸めたり文字列化したりせず、そのままCSVへ保存する。
+  # 小数点以下の表示桁数は03_formatting.RのExcelセル書式で制御する。
+  result
 }
 
 # ------------------------------------------------------------------------------

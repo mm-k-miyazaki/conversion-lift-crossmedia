@@ -25,6 +25,7 @@ Validation results:
   - configured KPI results: 21
   - processed masterdata CSV generated in smoke test: 7
   - IPW-DID result CSV generated in smoke test: 21
+  - CSV numeric precision round-trip: passed for all 21 result RDS
   - analysis axes: overall only
   - R parse check: passed for all pipeline and validation scripts
 

@@ -102,6 +102,11 @@ result_checks <- lapply(calculation_results, function(project_result) {
 
   lapply(project_result$kpi_results, function(kpi_result) {
     result <- readRDS(kpi_result$rds_path)
+    csv_result <- readr::read_csv(
+      kpi_result$csv_path,
+      show_col_types = FALSE,
+      na = c("", "NA")
+    )
 
     if ("message" %in% names(result)) {
       messages <- unique(result$message[!is.na(result$message)])
@@ -122,6 +127,34 @@ result_checks <- lapply(calculation_results, function(project_result) {
 
     if (!all(c("案件名", "媒体", "KPI", "media_contact_flg", "接触区分") %in% names(result))) {
       stop(project_result$project_name, " の結果メタデータ列が不足しています。")
+    }
+
+    numeric_result_cols <- names(result)[vapply(result, is.numeric, FUN.VALUE = logical(1))]
+    for (numeric_col in numeric_result_cols) {
+      if (!numeric_col %in% names(csv_result) || !is.numeric(csv_result[[numeric_col]])) {
+        stop(
+          project_result$project_name,
+          " / ",
+          kpi_result$kpi_label,
+          " のCSV数値列が数値型で保持されていません: ",
+          numeric_col
+        )
+      }
+
+      if (!isTRUE(all.equal(
+        as.numeric(csv_result[[numeric_col]]),
+        as.numeric(result[[numeric_col]]),
+        tolerance = 1e-12,
+        check.attributes = FALSE
+      ))) {
+        stop(
+          project_result$project_name,
+          " / ",
+          kpi_result$kpi_label,
+          " のCSV数値が丸められています: ",
+          numeric_col
+        )
+      }
     }
 
     TRUE

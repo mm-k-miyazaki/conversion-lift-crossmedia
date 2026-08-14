@@ -83,6 +83,52 @@ get_relative_path <- function(paths, root_dir) {
   )
 }
 
+apply_excel_numeric_styles <- function(
+  wb,
+  sheet,
+  data,
+  decimal_style,
+  integer_style
+) {
+  if (nrow(data) == 0 || ncol(data) == 0) {
+    return(invisible(TRUE))
+  }
+
+  numeric_col_names <- names(data)[vapply(data, is.numeric, FUN.VALUE = logical(1))]
+  integer_col_names <- intersect(
+    c("media_contact_flg", "treat_flg", "N"),
+    numeric_col_names
+  )
+  decimal_col_names <- setdiff(numeric_col_names, integer_col_names)
+  data_rows <- 2:(nrow(data) + 1)
+
+  if (length(integer_col_names) > 0) {
+    openxlsx::addStyle(
+      wb,
+      sheet = sheet,
+      style = integer_style,
+      rows = data_rows,
+      cols = match(integer_col_names, names(data)),
+      gridExpand = TRUE,
+      stack = TRUE
+    )
+  }
+
+  if (length(decimal_col_names) > 0) {
+    openxlsx::addStyle(
+      wb,
+      sheet = sheet,
+      style = decimal_style,
+      rows = data_rows,
+      cols = match(decimal_col_names, names(data)),
+      gridExpand = TRUE,
+      stack = TRUE
+    )
+  }
+
+  invisible(TRUE)
+}
+
 # ------------------------------------------------------------------------------
 # 1. Excel作成メイン
 # ------------------------------------------------------------------------------
@@ -142,6 +188,9 @@ make_excel_from_result_csv <- function(ctx) {
     borderColour = "#D9EAD3"
   )
 
+  integer_style <- openxlsx::createStyle(numFmt = "0")
+  decimal_style <- openxlsx::createStyle(numFmt = "0.0")
+
   index_sheet <- csv_info %>%
     dplyr::select(
       案件名,
@@ -184,6 +233,13 @@ make_excel_from_result_csv <- function(ctx) {
     withFilter = TRUE
   )
   openxlsx::freezePane(wb, sheet = "ALL_RESULTS", firstActiveRow = 2)
+  apply_excel_numeric_styles(
+    wb = wb,
+    sheet = "ALL_RESULTS",
+    data = all_results,
+    decimal_style = decimal_style,
+    integer_style = integer_style
+  )
   openxlsx::setColWidths(wb, sheet = "ALL_RESULTS", cols = 1:ncol(all_results), widths = "auto")
 
   # CSVごとに個別シートも作成します。
@@ -213,6 +269,14 @@ make_excel_from_result_csv <- function(ctx) {
       wb,
       sheet = sheet_i,
       firstActiveRow = 2
+    )
+
+    apply_excel_numeric_styles(
+      wb = wb,
+      sheet = sheet_i,
+      data = df_i,
+      decimal_style = decimal_style,
+      integer_style = integer_style
     )
 
     if (ncol(df_i) > 0) {
